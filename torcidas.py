@@ -7,25 +7,22 @@ st.title("Maiores Torcidas do Mundo")
 # Ler CSV
 df = pd.read_csv("torcidas.csv")
 
-# Mostrar colunas existentes
-st.write("Colunas do CSV:")
-st.write(df.columns)
+# Remover espaços e padronizar nomes das colunas
+df.columns = df.columns.str.strip().str.lower()
 
 # Mostrar tabela
 st.subheader("Tabela de Dados")
 st.write(df)
 
-# Verificar se as colunas existem
-if "time" in df.columns and "torcedores_milhoes" in df.columns:
+# Mostrar nomes das colunas
+st.write("Colunas encontradas:")
+st.write(df.columns)
 
-    # Criar gráfico
-    st.subheader("Gráfico de Barras")
+# Criar gráfico
+st.subheader("Gráfico de Barras")
 
-    grafico = df.set_index("time")
+# Definir índice
+grafico = df.set_index("time")
 
-    st.bar_chart(grafico["torcedores_milhoes"])
-
-else:
-    st.error(
-        "As colunas 'time' e/ou 'torcedores_milhoes' não foram encontradas no CSV."
-    )
+# Mostrar gráfico
+st.bar_chart(grafico["torcedores_milhoes"])
