@@ -2,27 +2,31 @@ import streamlit as st
 import pandas as pd
 
 # Título
-st.title("Maiores Torcidas do Mundo")
+st.title("📊 Maiores Torcidas do Mundo")
 
 # Ler CSV
 df = pd.read_csv("torcidas.csv")
 
-# Remover espaços e padronizar nomes das colunas
+# Padronizar colunas
 df.columns = df.columns.str.strip().str.lower()
 
-# Mostrar tabela
-st.subheader("Tabela de Dados")
-st.write(df)
+# Mostrar dados
+st.subheader("📋 Dados da Tabela")
+st.dataframe(df)
 
-# Mostrar nomes das colunas
-st.write("Colunas encontradas:")
-st.write(df.columns)
+# Ordenar dados (IMPORTANTE para gráfico ficar bonito)
+df = df.sort_values("torcedores_milhoes", ascending=True)
 
-# Criar gráfico
-st.subheader("Gráfico de Barras")
+# Criar gráfico com Streamlit (melhor que matplotlib aqui)
+st.subheader("📈 Gráfico de Barras")
 
-# Definir índice
-grafico = df.set_index("time")
+st.bar_chart(
+    df.set_index("time")["torcedores_milhoes"]
+)
 
-# Mostrar gráfico
-st.bar_chart(grafico["torcedores_milhoes"])
+# Destaque extra: maior torcida
+maior = df.loc[df["torcedores_milhoes"].idxmax()]
+
+st.success(
+    f"🔥 Maior torcida: {maior['time']} com {maior['torcedores_milhoes']} milhões de torcedores"
+)
