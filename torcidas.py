@@ -1,30 +1,37 @@
 import streamlit as st
 import pandas as pd
 
-# Título da aplicação
 st.title("📊 Maiores Torcidas do Mundo")
 
-# Ler CSV (arquivo local)
+# Ler CSV
 df = pd.read_csv("torcidas.csv")
 
-# Padronizar nomes das colunas
+# Padronizar colunas
 df.columns = df.columns.str.strip().str.lower()
+
+# Garantir que a coluna numérica é número
+df["torcedores_milhoes"] = pd.to_numeric(df["torcedores_milhoes"], errors="coerce")
+
+# Remover linhas com erro
+df = df.dropna()
 
 # Mostrar tabela
 st.subheader("📋 Tabela de Dados")
 st.dataframe(df)
 
-# Ordenar do maior para o menor
+# Ordenar
 df = df.sort_values("torcedores_milhoes", ascending=False)
 
-# Gráfico de colunas (vertical)
+# Criar gráfico de colunas (FORMA MAIS SEGURA)
 st.subheader("📈 Gráfico de Colunas")
 
-dados_grafico = df.set_index("time")["torcedores_milhoes"]
+st.bar_chart(
+    data=df,
+    x="time",
+    y="torcedores_milhoes"
+)
 
-st.column_chart(dados_grafico)
-
-# Mostrar maior torcida
+# Maior torcida
 maior = df.iloc[0]
 
 st.success(
