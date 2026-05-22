@@ -1,48 +1,45 @@
 import streamlit as st
 import pandas as pd
 
-st.title("📊 Torcidas de Futebol")
+# Título da aplicação
+st.title("📊 Maiores Torcidas do Mundo")
 
 # Ler CSV
 df = pd.read_csv("torcidas.csv")
 
-# Mostrar colunas (DEBUG IMPORTANTE)
-st.write("🔎 Colunas encontradas:", df.columns)
-
-# Padronizar nomes
-df.columns = df.columns.str.strip().str.lower()
-
-# Conferir dados brutos
-st.subheader("📋 Dados originais")
+# Mostrar dados originais
+st.subheader("📋 Tabela de Dados")
 st.dataframe(df)
 
-# Converter valores para número (FORÇADO)
-df["torcedores_milhoes"] = (
-    df["torcedores_milhoes"]
-    .astype(str)
-    .str.replace(",", ".")
-)
+# -----------------------------
+# 🔧 PARTE ADICIONADA (SUA CORREÇÃO)
+# -----------------------------
 
+# corrigir espaços nos nomes
+df.columns = df.columns.str.strip().str.lower()
+
+# garantir que existe dado válido
+df = df.dropna(subset=["time", "torcedores_milhoes"])
+
+# converter número de forma segura
+df["torcedores_milhoes"] = df["torcedores_milhoes"].astype(str)
+df["torcedores_milhoes"] = df["torcedores_milhoes"].str.replace(",", ".")
 df["torcedores_milhoes"] = pd.to_numeric(df["torcedores_milhoes"], errors="coerce")
 
-# Remover linhas inválidas
-df = df.dropna()
+# remover só valores inválidos da coluna numérica
+df = df.dropna(subset=["torcedores_milhoes"])
 
-# Ordenar
+# ordenar
 df = df.sort_values("torcedores_milhoes", ascending=False)
 
-# 🔥 TESTE: mostrar dados usados no gráfico
-st.subheader("📊 Dados do gráfico")
-st.dataframe(df[["time", "torcedores_milhoes"]])
+# -----------------------------
 
-# GRÁFICO
+# 🔥 GRÁFICO (FUNCIONANDO)
 st.subheader("📈 Gráfico em Colunas")
 
 st.bar_chart(df.set_index("time")["torcedores_milhoes"])
 
-# Maior torcida
+# Mostrar maior torcida (opcional mas útil)
 if not df.empty:
     maior = df.iloc[0]
     st.success(f"🔥 Maior torcida: {maior['time']} ({maior['torcedores_milhoes']} milhões)")
-else:
-    st.error("❌ Nenhum dado válido para o gráfico")
