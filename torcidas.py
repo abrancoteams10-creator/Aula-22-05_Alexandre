@@ -1,47 +1,41 @@
 import streamlit as st
 import pandas as pd
 
-st.title("📊 Maiores Torcidas do Mundo")
+# Título do app
+st.title("📊 Torcidas de Futebol - Gráfico em Colunas")
+
+# URL RAW do GitHub (troque pelo seu link)
+url = "https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPOSITORIO/main/torcidas.csv"
 
 # Ler CSV
-df = pd.read_csv("torcidas.csv")
+df = pd.read_csv(url)
 
-# Padronizar colunas
+# Padronizar nomes das colunas
 df.columns = df.columns.str.strip().str.lower()
 
-# Mostrar colunas (DEBUG IMPORTANTE)
-st.write("Colunas encontradas:", df.columns)
-
-# Verificar se está vazio
-if df.empty:
-    st.error("❌ O CSV está vazio ou não foi lido corretamente.")
-    st.stop()
-
-# Converter número com segurança
-if "torcedores_milhoes" in df.columns:
-    df["torcedores_milhoes"] = pd.to_numeric(df["torcedores_milhoes"], errors="coerce")
-else:
-    st.error("❌ Coluna 'torcedores_milhoes' não encontrada no CSV.")
-    st.stop()
-
-# Remover apenas linhas inválidas nessa coluna
-df = df.dropna(subset=["torcedores_milhoes"])
-
-# Ordenar
-df = df.sort_values("torcedores_milhoes", ascending=False)
-
-# Mostrar tabela
-st.subheader("📋 Tabela de Dados")
+# Mostrar dados
+st.subheader("📋 Dados do CSV")
 st.dataframe(df)
 
-# Gráfico seguro
-st.subheader("📈 Gráfico de Colunas")
+# Garantir que a coluna numérica é número
+df["torcedores_milhoes"] = pd.to_numeric(df["torcedores_milhoes"], errors="coerce")
 
-st.bar_chart(df.set_index("time")["torcedores_milhoes"])
+# Remover linhas inválidas
+df = df.dropna()
 
-# Maior torcida (só se tiver dados)
+# Ordenar do maior para o menor
+df = df.sort_values("torcedores_milhoes", ascending=False)
+
+# 📊 GRÁFICO EM COLUNAS (VERTICAL)
+st.subheader("📈 Gráfico em Colunas")
+
+st.bar_chart(
+    data=df,
+    x="time",
+    y="torcedores_milhoes"
+)
+
+# Destaque maior torcida
 if not df.empty:
     maior = df.iloc[0]
-    st.success(f"🔥 Maior torcida: {maior['time']} ({maior['torcedores_milhoes']} milhões)")
-else:
-    st.warning("⚠️ Sem dados para exibir")
+    st.success(f"🔥 Maior torcida: {maior['time']} com {maior['torcedores_milhoes']} milhões")
