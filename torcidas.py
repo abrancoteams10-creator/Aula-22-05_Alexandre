@@ -14,18 +14,20 @@ df.columns = df.columns.str.strip().str.lower()
 st.subheader("📋 Dados da Tabela")
 st.dataframe(df)
 
-# Ordenar dados (IMPORTANTE para gráfico ficar bonito)
-df = df.sort_values("torcedores_milhoes", ascending=True)
+# Ordenar para visual melhor
+df = df.sort_values("torcedores_milhoes", ascending=False)
 
-# Criar gráfico com Streamlit (melhor que matplotlib aqui)
+# Gráfico de barras verticais (colunas)
 st.subheader("📈 Gráfico de Barras")
 
 st.bar_chart(
-    df.set_index("time")["torcedores_milhoes"]
+    data=df,
+    x="time",
+    y="torcedores_milhoes"
 )
 
-# Destaque extra: maior torcida
-maior = df.loc[df["torcedores_milhoes"].idxmax()]
+# Destaque maior torcida
+maior = df.iloc[0]
 
 st.success(
     f"🔥 Maior torcida: {maior['time']} com {maior['torcedores_milhoes']} milhões de torcedores"
